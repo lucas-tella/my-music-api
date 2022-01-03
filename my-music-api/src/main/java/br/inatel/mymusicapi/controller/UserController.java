@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,35 +23,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.inatel.mymusicapi.dao.UserDao;
 import br.inatel.mymusicapi.dto.ErrorDto;
+import br.inatel.mymusicapi.dto.NewUserDto;
 import br.inatel.mymusicapi.dto.UserDto;
 import br.inatel.mymusicapi.model.Playlist;
-import br.inatel.mymusicapi.model.User;
-import br.inatel.mymusicapi.repository.UserRepository;
 import br.inatel.mymusicapi.service.UserService;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-	
-	@Autowired
-	private UserRepository userRepository;
+
 	@Autowired 
 	private UserService userService;
 	
-	
 	@PostMapping
 	@Transactional
-	public ResponseEntity<?> postUser(@RequestBody @Valid UserDto dto) {
+	public ResponseEntity<?> postUser(@RequestBody @Valid NewUserDto dto) {
 
-		User newUser = dto.convertToUser();
-		
-		if (userService.isEmailValid(newUser)) {
+		if (userService.isEmailValid(dto)) {
 			
-			userService.createNewUser(newUser);
+			UserDto newUser = userService.createNewUser(dto);
 			
-			return ResponseEntity.status(HttpStatus.CREATED).body(new UserDao(newUser));
+			return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
 		}
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(
 				403, "This email is already being used."));
@@ -60,12 +52,12 @@ public class UserController {
 	
 	@GetMapping("/{id}")
 	@Transactional
-	public ResponseEntity<?> getUserById(@PathVariable String id) {
+	public ResponseEntity<?> getUserById(@PathVariable Long id) {
 
-		Optional<User> user = userRepository.findById(id);
-
-		if (user.isPresent()) {
-			return ResponseEntity.status(HttpStatus.OK).body(new UserDao (user.get()));
+		UserDto dto = userService.getUser(id);
+		
+		if (!(dto == null)) {
+			return ResponseEntity.status(HttpStatus.OK).body(dto);
 		}
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -74,66 +66,61 @@ public class UserController {
 	
 	@DeleteMapping("/{id}")
 	@Transactional
-	public ResponseEntity<?> deleteUser(User user) {
+	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		
-		String id = user.getId();
-		Optional<User> genericUser = userRepository.findById(user.getId());
+		Long deletedUserId = userService.deleteUser(id);
 
-		if (genericUser.isPresent()) {
-			
-			userRepository.deleteById(user.getId());
+		if (!(deletedUserId==null)) {
 			
 			return ResponseEntity.status(HttpStatus.OK).body("User " + id + " deleted.");
 		}
 		
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "User not found."));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "User " + id + " not found."));
 	}
 	
 	@GetMapping("/{id}/playlists")
-	@Cacheable(value = "userPlaylists")
-	public ResponseEntity<?> listUserPlaylists(@PathVariable("id") String id) {
+	public ResponseEntity<?> listUserPlaylists(@PathVariable("id") Long id) {
 		
-		Optional<User> user = userRepository.findById(id);
-
-		if (user.isPresent()) {
-			List<Playlist> playlists = user.get().getMyPlaylists();
+		List<Playlist> playlists = userService.getUserPlaylists(id);
+		
+		if (!(playlists == null)) {
 
 			return ResponseEntity.status(HttpStatus.OK).body(playlists);
 		}
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "User not found."));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "User " + id + " not found."));
 	}
 	
-	@GetMapping()
-	public ResponseEntity<?> test() {
-		
-		HttpRequest request = null;
-		try {
-			request = HttpRequest.newBuilder()
-					.uri(new URI ("https://deezerdevs-deezer.p.rapidapi.com/infos"))
-					.header("x-rapidapi-host", "deezerdevs-deezer.p.rapidapi.com")
-					.header("x-rapidapi-key", "5982032ab7msh004d403d030bf5bp1713cfjsna7173a3b9528")
-					.method("GET", HttpRequest.BodyPublishers.noBody())
-					.build();
-		} catch (URISyntaxException e) {
-			
-			e.printStackTrace();
-		}
-		HttpResponse<String> response = null;
-		try {
-			// tentar utilizar WebClient;
-			response = HttpClient.newHttpClient().send(
-					request, HttpResponse.BodyHandlers.ofString());
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		System.out.println(response.body());
-		
-		return null;
-		
-	}
+//	@GetMapping()
+//	public ResponseEntity<?> test() {
+//		
+//		HttpRequest request = null;
+//		try {
+//			request = HttpRequest.newBuilder()
+//					.uri(new URI ("https://deezerdevs-deezer.p.rapidapi.com/infos"))
+//					.header("x-rapidapi-host", "deezerdevs-deezer.p.rapidapi.com")
+//					.header("x-rapidapi-key", "5982032ab7msh004d403d030bf5bp1713cfjsna7173a3b9528")
+//					.method("GET", HttpRequest.BodyPublishers.noBody())
+//					.build();
+//		} catch (URISyntaxException e) {
+//			
+//			e.printStackTrace();
+//		}
+//		HttpResponse<String> response = null;
+//		try {
+//			// tentar utilizar WebClient;
+//			response = HttpClient.newHttpClient().send(
+//					request, HttpResponse.BodyHandlers.ofString());
+//		} catch (IOException e) {
+//			
+//			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			
+//			e.printStackTrace();
+//		}
+//		System.out.println(response.body());
+//		
+//		return null;
+//		
+//	}
 }

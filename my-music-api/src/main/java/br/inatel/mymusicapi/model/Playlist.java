@@ -1,63 +1,40 @@
 package br.inatel.mymusicapi.model;
 
-import java.util.ArrayList;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "playlists")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Playlist {
 	
 	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	private String playlistID;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", nullable = false, length = 11)
+	private Long id;
 	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_user", referencedColumnName = "id", nullable = false)
+	private User user;
+	
+	@Column(name = "title", nullable = false)
 	private String title;
-	private String description="Standard description";
 	
-	@ManyToOne()
-	@JoinColumn(name="USER_ID", nullable=false, updatable=false)
-	private User owner;
-	
-	private ArrayList<String> trackId = new ArrayList<>();
-
-	public Playlist(String title, String description, User owner) {
-		this.title = title;
-		this.description = description;
-		this.owner = owner;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getPlaylistID() {
-		return playlistID;
-	}
-
-	public User getOwner() {
-		return owner;
-	}
-
-	public ArrayList<String> getTracksId() {
-		return trackId;
-	}
+	@Column(name = "description", nullable = true)
+	private String description;
 }

@@ -34,24 +34,16 @@ import br.inatel.mymusicapi.service.UserService;
 @RequestMapping("/playlists")
 public class PlaylistController {
 
-	@Autowired
-	private PlaylistRepository playlistRepository;
 	@Autowired 
 	private PlaylistService playlistService;
-	@Autowired
-	private UserRepository userRepository;
 	
 	
 	@PostMapping("/{id}")
 	@Transactional
 	public ResponseEntity<?> postPlaylist(@RequestBody @Valid PlaylistDto dto,
-					UriComponentsBuilder uriBuilder, @PathVariable("id") String id){
+					UriComponentsBuilder uriBuilder, @PathVariable("id") Long userId){
 		
-		User user = userRepository.getById(id);
-		dto.setOwner(user);
-
-		Playlist newPlaylist = dto.convertToPlaylist();
-		playlistRepository.save(newPlaylist);
+		PlaylistDto newPlaylist = playlistService.createNewPlaylist(dto, userId);
 		
 		URI uri = uriBuilder.path("/playlists/{id}").buildAndExpand(newPlaylist.getPlaylistID()).toUri();
 		

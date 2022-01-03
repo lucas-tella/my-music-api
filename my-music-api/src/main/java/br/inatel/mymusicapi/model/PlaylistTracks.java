@@ -2,40 +2,38 @@ package br.inatel.mymusicapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name = "profiles")
+@Table(name = "playlist_tracks")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Profile{
+public class PlaylistTracks {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false, length = 11)
 	private Long id;
 	
-	@OneToOne
-	@MapsId							 //dar uma lida
-	@JoinColumn(name = "user_id")
-	private User user;
-
-	@Column(name = "name", nullable = false)
-	@Getter @Setter
-	private String name;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_playlist", referencedColumnName = "ID", nullable = false)
+	private Playlist playlist;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_track", referencedColumnName = "ID", nullable = false)
+	private Track track;
+	
 }
