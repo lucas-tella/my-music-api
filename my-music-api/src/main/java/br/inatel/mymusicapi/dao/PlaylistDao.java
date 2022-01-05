@@ -20,9 +20,6 @@ public class PlaylistDao {
 	private UserDto owner;
 	private List<TracksDao> tracks;
 	private int totalTracks;
-
-	
-	
 	
 //	public PlaylistDao(Playlist playlist) {
 //		this.id = playlist.getPlaylistID();

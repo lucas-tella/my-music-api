@@ -24,7 +24,6 @@ import br.inatel.mymusicapi.dto.ErrorDto;
 import br.inatel.mymusicapi.dto.PlaylistDto;
 import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.model.User;
-import br.inatel.mymusicapi.repository.LikeRepository;
 import br.inatel.mymusicapi.repository.PlaylistRepository;
 import br.inatel.mymusicapi.repository.UserRepository;
 import br.inatel.mymusicapi.service.PlaylistService;
@@ -37,7 +36,6 @@ public class PlaylistController {
 	@Autowired 
 	private PlaylistService playlistService;
 	
-	
 	@PostMapping("/{id}")
 	@Transactional
 	public ResponseEntity<?> postPlaylist(@RequestBody @Valid PlaylistDto dto,
@@ -45,47 +43,47 @@ public class PlaylistController {
 		
 		PlaylistDto newPlaylist = playlistService.createNewPlaylist(dto, userId);
 		
-		URI uri = uriBuilder.path("/playlists/{id}").buildAndExpand(newPlaylist.getPlaylistID()).toUri();
+		URI uri = uriBuilder.path("/playlists/{id}").buildAndExpand(newPlaylist.getId()).toUri();
 		
-		return ResponseEntity.created(uri).body(new PlaylistDao(newPlaylist));
+		return ResponseEntity.created(uri).body(newPlaylist);
 	}
 	
-	@GetMapping
-	public ResponseEntity<?> listAllPlaylists() {
-
-		List<Playlist> playlists = playlistRepository.findAll();
-		
-		return ResponseEntity.status(HttpStatus.OK).body(PlaylistDao.convertToDaoList(playlists));
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> listById(@PathVariable("id") String id) {
-
-		Optional<Playlist> genericPlaylist = playlistRepository.findById(id);
-
-		if (genericPlaylist.isPresent()) {
-			PlaylistDao playlistDao = new PlaylistDao(genericPlaylist.get());
-			
-			return ResponseEntity.status(HttpStatus.OK).body(playlistDao);
-		}
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "Playlist not found."));
-	}
-
-	@GetMapping("/search")
-	public ResponseEntity<?> searchByTitle(String title) {
-
-		Optional<Playlist> genericPlaylist = playlistRepository.findByTitle(title);
-
-		if (genericPlaylist.isPresent()) {
-			PlaylistDao playlistDao = new PlaylistDao(genericPlaylist.get());
-			
-			return ResponseEntity.status(HttpStatus.OK).body(playlistDao);
-		}
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "Playlist not found."));
-	}
-	
+//	@GetMapping
+//	public ResponseEntity<?> listAllPlaylists() {
+//
+//		List<Playlist> playlists = playlistRepository.findAll();
+//		
+//		return ResponseEntity.status(HttpStatus.OK).body(PlaylistDao.convertToDaoList(playlists));
+//	}
+//	
+//	@GetMapping("/{id}")
+//	public ResponseEntity<?> listById(@PathVariable("id") String id) {
+//
+//		Optional<Playlist> genericPlaylist = playlistRepository.findById(id);
+//
+//		if (genericPlaylist.isPresent()) {
+//			PlaylistDao playlistDao = new PlaylistDao(genericPlaylist.get());
+//			
+//			return ResponseEntity.status(HttpStatus.OK).body(playlistDao);
+//		}
+//
+//		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "Playlist not found."));
+//	}
+//
+//	@GetMapping("/search")
+//	public ResponseEntity<?> searchByTitle(String title) {
+//
+//		Optional<Playlist> genericPlaylist = playlistRepository.findByTitle(title);
+//
+//		if (genericPlaylist.isPresent()) {
+//			PlaylistDao playlistDao = new PlaylistDao(genericPlaylist.get());
+//			
+//			return ResponseEntity.status(HttpStatus.OK).body(playlistDao);
+//		}
+//
+//		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "Playlist not found."));
+//	}
+//	
 //	@PutMapping("/{id}")
 //	@Transactional
 //	public ResponseEntity<PlaylistDao> updatePlaylist(@PathVariable("id") String id,

@@ -20,7 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,12 +32,8 @@ public class User{
 	@Column(name = "id", nullable = false, length = 11)
 	private Long id;
 	
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Playlist> playlists;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_profile", referencedColumnName = "id")
-	private Profile profile;
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Playlist> playlist;
 	
 	@Column(name = "user_name", nullable = false)
 	private String userName;
@@ -45,6 +41,10 @@ public class User{
 	@Column(name = "email", nullable = false)
 	private String email;
 	
-	@Column(name = "id", nullable = false)
+	@Column(name = "password", nullable = false)
 	private String password;
+	
+//	@OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "id_profile", referencedColumnName = "id")
+//	private Profile profile;
 }
