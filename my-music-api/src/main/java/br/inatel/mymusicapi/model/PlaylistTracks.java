@@ -1,5 +1,7 @@
 package br.inatel.mymusicapi.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,12 +18,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "playlist_tracks")
+@Table(name = "playlist_track")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PlaylistTracks {
+public class PlaylistTracks implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,11 +33,11 @@ public class PlaylistTracks {
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_playlist", referencedColumnName = "ID", nullable = false)
+	@JoinColumn(name = "id_playlist", referencedColumnName = "id", nullable = false)
 	private Playlist playlist;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_track", referencedColumnName = "ID", nullable = false)
+	@JoinColumn(name = "id_track", referencedColumnName = "id", nullable = false)
 	private Track track;
 	
 }

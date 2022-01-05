@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class NewUserDto {
@@ -31,4 +31,10 @@ public class NewUserDto {
 	@NotEmpty
 	@Length(min = 8)
 	private String password;
+	
+	public NewUserDto(String name, String email, String password) {
+		this.name = name;
+		this.email = email;
+		this.password = password;
+	}
 }

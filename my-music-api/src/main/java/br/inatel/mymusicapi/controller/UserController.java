@@ -30,14 +30,13 @@ import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.service.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping (value = "/users")
 public class UserController {
 
 	@Autowired 
 	private UserService userService;
 	
 	@PostMapping
-	@Transactional
 	public ResponseEntity<?> postUser(@RequestBody @Valid NewUserDto dto) {
 
 		if (userService.isEmailValid(dto)) {
@@ -50,8 +49,7 @@ public class UserController {
 				403, "This email is already being used."));
 	}
 	
-	@GetMapping("/{id}")
-	@Transactional
+	@GetMapping (value = "/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Long id) {
 
 		UserDto dto = userService.getUser(id);
@@ -64,8 +62,7 @@ public class UserController {
 				new ErrorDto(404, "User Id " + id + " not found."));
 	}
 	
-	@DeleteMapping("/{id}")
-	@Transactional
+	@DeleteMapping (value = "/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		
 		Long deletedUserId = userService.deleteUser(id);

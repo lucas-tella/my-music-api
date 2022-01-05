@@ -41,6 +41,7 @@ public class PlaylistService {
 			User user = foundUser.get();
 
 			return PlaylistDto.builder()
+					.id(newPlaylist.getId())
 					.title(newPlaylist.getTitle())
 					.description(newPlaylist.getDescription())
 					.user(user)
@@ -49,6 +50,4 @@ public class PlaylistService {
 		
 		return null;
 	}
-	
-	
 }

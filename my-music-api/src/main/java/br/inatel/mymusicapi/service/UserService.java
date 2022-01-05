@@ -111,7 +111,7 @@ public class UserService {
 			
 			User foundUser = user.get();
 			
-			return foundUser.getPlaylists();
+//			return foundUser.getPlaylists();
 		}
 		
 		return null;
