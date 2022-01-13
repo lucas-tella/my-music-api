@@ -6,15 +6,9 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-//@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class NewUserDto {
 	
 	@NotNull

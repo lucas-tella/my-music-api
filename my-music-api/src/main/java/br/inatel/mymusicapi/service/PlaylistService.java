@@ -1,13 +1,16 @@
 package br.inatel.mymusicapi.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.inatel.mymusicapi.dto.NewUserDto;
+import br.inatel.mymusicapi.adapter.ExternalApiAdapter;
+import br.inatel.mymusicapi.dto.NewPlaylistDto;
 import br.inatel.mymusicapi.dto.PlaylistDto;
-import br.inatel.mymusicapi.dto.UserDto;
+import br.inatel.mymusicapi.dto.TrackDto;
+import br.inatel.mymusicapi.dto.TrackExtendedDto;
 import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.model.User;
 import br.inatel.mymusicapi.repository.PlaylistRepository;
@@ -22,32 +25,99 @@ public class PlaylistService {
 	private UserRepository userRepository;
 	@Autowired
 	private PlaylistRepository playlistRepository;
+	@Autowired
+	private ExternalApiAdapter adapter;
 	
-	public PlaylistDto createNewPlaylist(PlaylistDto dto, Long userId) {
-		
-		Playlist playlist = Playlist.builder()
-				.title(dto.getTitle())
-				.description(dto.getDescription())
-				.build();
-		
-		Optional<Playlist> foundPlaylist = playlistRepository.findById(playlist.getId());
-		
-		Optional<User> foundUser = userRepository.findById(userId);
-		
-		if(!foundPlaylist.isPresent() && foundUser.isPresent()) {
-			
+	public PlaylistDto createNewPlaylist(NewPlaylistDto dto) {
+		Playlist playlist = new Playlist(dto);
+		Optional<User> user = userRepository.findById(dto.getUserId());
+		if(user.isPresent()) {
+			User foundUser = user.get();
+			playlist.setUser(foundUser);
 			Playlist newPlaylist = playlistRepository.save(playlist);
-			
-			User user = foundUser.get();
-
-			return PlaylistDto.builder()
-					.id(newPlaylist.getId())
-					.title(newPlaylist.getTitle())
-					.description(newPlaylist.getDescription())
-					.user(user)
-					.build();
+			foundUser.getPlaylists().add(playlist);
+			return new PlaylistDto(newPlaylist);
 		}
-		
+		return null;
+	}
+	
+	public boolean isTitleValid (NewPlaylistDto dto) {
+		Optional <Playlist> optPlaylist = playlistRepository.findByTitle(dto.getTitle());
+		if(optPlaylist.isPresent()) {
+			return false;
+		}
+		return true;
+	}
+	
+	public List<PlaylistDto> getUserPlaylists(Long userId) {
+		Optional <User> user = userRepository.findById(userId);
+		if(user.isPresent()) {
+			List<Playlist> playlists = user.get().getPlaylists();
+			List<PlaylistDto> dto = new PlaylistDto().convert(playlists);
+			//essa conversão não está passando as TrackExtendedDto corretamente (ainda bem).
+			//deveria passar trackIds.
+			return dto;
+		}
+		return null;
+	}
+
+	public Long deletePlaylist(Long id) {
+			Optional<Playlist> playlist = playlistRepository.findById(id);
+			if (playlist.isPresent()) {
+				playlistRepository.deleteById(id);
+				return playlist.get().getId();
+			}
+			return null;
+	}
+	
+	public Playlist getPlaylist (Long id) {
+		Optional<Playlist> playlist = playlistRepository.findById(id);
+		if (playlist.isPresent()) {
+			return playlist.get();
+		}
+		return null;
+	}
+	
+	public PlaylistDto update(Long id, NewPlaylistDto dto) {
+		Optional<Playlist> playlist = playlistRepository.findById(id);
+		if (playlist.isPresent()) {
+			Playlist foundPlaylist = playlist.get();
+			foundPlaylist.setTitle(dto.getTitle());
+			foundPlaylist.setDescription(dto.getDescription());
+			savePlaylist(foundPlaylist);
+			PlaylistDto updatedDto = new PlaylistDto(foundPlaylist);
+			return updatedDto;
+		}
+		return null;
+	}
+	
+	public TrackExtendedDto addTrackToPlaylist (Long playlistId, TrackDto dto) {
+		Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+		if (playlist.isPresent() && !playlist.get().getTrackIds().contains(dto.getId())) {
+				TrackExtendedDto track = adapter.getTrackById(dto.getId());
+				if (!(track.getId()==null)) {
+					playlist.get().getTrackIds().add(dto.getId());
+					return track;
+			}
+		}
+		return null;
+	}
+	
+	public Playlist savePlaylist (Playlist playlist) {
+		return playlistRepository.save(playlist);
+	}
+	
+	public PlaylistDto getPlaylistTracks (Long id) {
+		Optional<Playlist> playlist = playlistRepository.findById(id);
+		if (playlist.isPresent()) {
+			PlaylistDto dto = new PlaylistDto(playlist.get());
+			List<String> trackIds = playlist.get().getTrackIds();
+			for(String trackId : trackIds) {
+				TrackExtendedDto track = adapter.getTrackById(trackId);
+				dto.getTracks().add(track);
+			}
+			return dto;
+		}
 		return null;
 	}
 }

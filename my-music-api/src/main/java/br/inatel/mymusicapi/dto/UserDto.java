@@ -1,17 +1,22 @@
 package br.inatel.mymusicapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import br.inatel.mymusicapi.model.User;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class UserDto {
 	
 	private Long id;
 	private String name;
 	private String email;
+	
+	public UserDto(User user) {
+		super();
+		this.id = user.getId();
+		this.name = user.getUserName();
+		this.email = user.getEmail();
+	}
+	
+	public UserDto() {}
+	
 }

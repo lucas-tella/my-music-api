@@ -11,8 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 
-	
-	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 	}
@@ -20,8 +18,10 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-		.antMatchers("/users").permitAll()
-		.antMatchers("/palylists").permitAll();
+		.antMatchers("/*").permitAll()
+		.and().csrf().disable(); 	
+//		.antMatchers("/users").permitAll()
+//		.antMatchers("/playlists").permitAll()
 //		.anyRequest();
 	}
 	
