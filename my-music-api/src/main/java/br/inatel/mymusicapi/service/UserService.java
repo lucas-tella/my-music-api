@@ -7,6 +7,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.inatel.mymusicapi.dto.NewUserDto;
@@ -26,19 +27,13 @@ public class UserService {
 	public UserDto createNewUser(NewUserDto dto) {
 		if(isEmailValid(dto)) {
 			User user = new User(dto);
+			user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 			User newUser = repository.save(user);
 			return new UserDto(newUser);
 		}
 		return null;
 	}
 	
-	public boolean isPasswordValid(NewUserDto dto) {
-		if (dto.getPassword().toString().length()==8) {
-			return true;
-		}
-		return false;
-	}
-
 	public boolean isEmailValid(NewUserDto dto) {
 		Optional<User> existingEmail = repository.findByEmail(dto.getEmail());
 		if (!existingEmail.isPresent() && isEmailAddressValid(dto)) {
@@ -56,6 +51,13 @@ public class UserService {
 			result = false;
 		}
 		return result;
+	}
+	
+	public boolean isPasswordValid(NewUserDto dto) {
+		if (dto.getPassword().toString().length()==8) {
+			return true;
+		}
+		return false;
 	}
 
 	public Long deleteUser(Long id) {

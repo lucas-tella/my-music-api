@@ -5,13 +5,13 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,11 +36,11 @@ public class UserController {
 				UserDto newUser = userService.createNewUser(dto);
 				return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
 			}
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(
-					403, "The password must have 8 characters."));
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+					new ErrorDto(403, "The password must have 8 characters."));
 		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(
-				403, "This email is already being used."));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+				new ErrorDto(403, "Invalid email."));
 	}
 	
 	@GetMapping (value = "/{id}")
@@ -57,18 +57,20 @@ public class UserController {
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		Long deletedUserId = userService.deleteUser(id);
 		if (!(deletedUserId==null)) {
-			return ResponseEntity.status(HttpStatus.OK).body("User '" + id + "' deleted.");
+			return ResponseEntity.status(HttpStatus.OK).body("User " + id + " deleted.");
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User '" + id + "' not found."));
+				new ErrorDto(404, "User " + id + " not found."));
 	}
 	
 	@GetMapping("/{id}/playlists")
+	@Cacheable(value="listUserPlaylist")
 	public ResponseEntity<?> listUserPlaylists(@PathVariable("id") Long id) {
 		List<Playlist> playlists = userService.getUserPlaylists(id);
 		if (!(playlists == null)) {
 			return ResponseEntity.status(HttpStatus.OK).body(playlists);
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(404, "User " + id + " not found."));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+				new ErrorDto(404, "User " + id + " not found."));
 	}
 }

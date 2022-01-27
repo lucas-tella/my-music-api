@@ -6,6 +6,8 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,11 +43,11 @@ public class PlaylistController {
 			if(!(newPlaylist == null)) {
 				return ResponseEntity.status(HttpStatus.CREATED).body(newPlaylist);
 			}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(
-					404, "User id '" + dto.getUserId() + "' not found."));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+					new ErrorDto(404, "User id " + dto.getUserId() + " not found."));
 		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(
-				403, "This title is already being used in another Playlist."));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+				new ErrorDto(403, "This title is already being used in another Playlist."));
 	}
 	
 	@GetMapping
@@ -55,7 +57,7 @@ public class PlaylistController {
 			return ResponseEntity.status(HttpStatus.OK).body(playlists);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User Id '" + userId + "' not found."));
+				new ErrorDto(404, "User Id " + userId + " not found."));
 	}
 	
 	@PutMapping("/{id}")
@@ -66,26 +68,29 @@ public class PlaylistController {
 			return ResponseEntity.status(HttpStatus.OK).body(updatedPlaylist);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Playlist Id '" + id + "' not found."));	
+				new ErrorDto(404, "Playlist Id " + id + " not found."));	
 		}
 	
 	@DeleteMapping ("/{id}")
+	@CacheEvict(value="listPlaylistTracksById", allEntries = true)
 	public ResponseEntity<?> deletePlaylist(@PathVariable Long id) {
 		Long deletedPlaylistId = playlistService.deletePlaylist(id);
 		if (!(deletedPlaylistId==null)) {
-			return ResponseEntity.status(HttpStatus.OK).body("Playlist '" + id + "' deleted.");
+			return ResponseEntity.status(HttpStatus.OK).body(
+					"Playlist " + id + " deleted.");
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Playlist '" + id + "' not found."));
+				new ErrorDto(404, "Playlist " + id + " not found."));
 	}	
 	
 	@PostMapping("/{id}/tracks")
 	@Transactional
+	@CacheEvict(value="listPlaylistTracksById", allEntries = true)
 	public ResponseEntity<?> postTrack(@PathVariable Long id, @RequestBody TrackDto dto) {
 		Playlist playlist = playlistService.getPlaylist(id);
 		if (playlist==null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ErrorDto(404, "Playlist '" + id + "' not found."));
+					new ErrorDto(404, "Playlist " + id + " not found."));
 		}
 		TrackExtendedDto track = playlistService.addTrackToPlaylist(id, dto);
 		if (!(track==null)) {
@@ -93,51 +98,16 @@ public class PlaylistController {
 			return ResponseEntity.status(HttpStatus.OK).body(track);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Track '" + dto.getId() + "' not found or already added to playlist '" + id + "'."));
+				new ErrorDto(404, "Track " + dto.getId() + " not found or already added to playlist " + id + "."));
 	}
 
 	@GetMapping("/{id}/tracks")
+	@Cacheable(value="listPlaylistTracksById")
 	public ResponseEntity<?> listPlaylistTracksById(@PathVariable Long id) {
-		return ResponseEntity.status(HttpStatus.OK).body(playlistService.getPlaylistTracks(id));
+		if (playlistService.getPlaylistTracks(id)!=null){
+			return ResponseEntity.status(HttpStatus.OK).body(playlistService.getPlaylistTracks(id));
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+				new ErrorDto(404, "Playlist " + id + " not found."));
 	}
-		
-//		Playlist playlist = playlistService.getPlaylist(id);
-//		
-//		if (playlist==null) {
-//			
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//					new ErrorDto(404, "Playlist Id '" + id + "' not found."));
-//		}
-//		
-//		if (!(playlistService.getUserPlaylists(id)==null)) {
-//
-//			List<PlaylistDto> playlists = playlistService.getUserPlaylists(id);
-//		
-//			return ResponseEntity.status(HttpStatus.OK).body(playlists);
-//		}
-//		
-//		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//				new ErrorDto(404, "User Id '" + id + "' not found."));
-//	}
-
-//	@PutMapping("/{id}")
-//	@Transactional
-//	public ResponseEntity<PlaylistDao> updatePlaylist(@PathVariable("id") String id,
-//			@RequestBody @Valid PlaylistDtoUpdate dto) {
-//
-//		Optional<Playlist> genericPlaylist = playlistRepository.findById(id);
-//
-//		if (genericPlaylist.isPresent()) {
-//
-//			if (User userId != genericPlaylist.get().getOwner().getId()) {
-//				return ResponseEntity.status(403).build();
-//			}
-//
-//			Playlist updatedPlaylist = dto.updatePlaylist(genericPlaylist.get());
-//			
-//			return ResponseEntity.ok(new PlaylistDao(updatedPlaylist));
-//		}
-//
-//		return ResponseEntity.notFound().build();
-//	}
 }

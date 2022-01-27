@@ -48,7 +48,7 @@ public class ExternalApiAdapter {
     private Mono<Exception> throwException(ClientResponse response){
     	
         Map<String, Object> responseBody = response.bodyToMono(Map.class).block();
-        String errorMessage = (String) responseBody.get("message");
+        String errorMessage = (String) responseBody.get("Error");
         return Mono.error(new Exception(errorMessage));
     }
     

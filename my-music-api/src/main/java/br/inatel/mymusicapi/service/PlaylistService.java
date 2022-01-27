@@ -92,17 +92,19 @@ public class PlaylistService {
 	}
 	
 	public TrackExtendedDto addTrackToPlaylist (Long playlistId, TrackDto dto) {
-		Optional<Playlist> playlist = playlistRepository.findById(playlistId);
-		if (playlist.isPresent() && !playlist.get().getTrackIds().contains(dto.getId())) {
-				TrackExtendedDto track = adapter.getTrackById(dto.getId());
-				if (!(track.getId()==null)) {
-					playlist.get().getTrackIds().add(dto.getId());
-					return track;
+		if (dto.getId()!=null) {
+			Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+			if (playlist.isPresent() && !playlist.get().getTrackIds().contains(dto.getId())) {
+					TrackExtendedDto track = adapter.getTrackById(dto.getId());
+					if (!(track.getId()==null)) {
+						playlist.get().getTrackIds().add(dto.getId());
+						return track;
+				}
 			}
+			return null;
 		}
 		return null;
 	}
-	
 	public Playlist savePlaylist (Playlist playlist) {
 		return playlistRepository.save(playlist);
 	}
