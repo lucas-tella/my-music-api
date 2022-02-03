@@ -1,25 +1,21 @@
 package br.inatel.mymusicapi.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.inatel.mymusicapi.dto.ErrorDto;
 import br.inatel.mymusicapi.dto.NewUserDto;
 import br.inatel.mymusicapi.dto.UserDto;
-import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.service.UserService;
 
 @RestController
@@ -43,34 +39,23 @@ public class UserController {
 				new ErrorDto(403, "Invalid email."));
 	}
 	
-	@GetMapping (value = "/{id}")
-	public ResponseEntity<?> getUserById(@PathVariable Long id) {
-		UserDto dto = userService.getUser(id);
+	@GetMapping
+	public ResponseEntity<?> getUserById(@RequestParam Long userId) {
+		UserDto dto = userService.getUser(userId);
 		if (!(dto == null)) {
 			return ResponseEntity.status(HttpStatus.OK).body(dto);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User Id '" + id + "' not found."));
+				new ErrorDto(404, "User Id '" + userId + "' not found."));
 	}
 	
-	@DeleteMapping (value = "/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		Long deletedUserId = userService.deleteUser(id);
+	@DeleteMapping
+	public ResponseEntity<?> deleteUser(@RequestParam Long userId) {
+		Long deletedUserId = userService.deleteUser(userId);
 		if (!(deletedUserId==null)) {
-			return ResponseEntity.status(HttpStatus.OK).body("User " + id + " deleted.");
+			return ResponseEntity.status(HttpStatus.OK).body("User " + userId + " deleted.");
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User " + id + " not found."));
-	}
-	
-	@GetMapping("/{id}/playlists")
-	@Cacheable(value="listUserPlaylist")
-	public ResponseEntity<?> listUserPlaylists(@PathVariable("id") Long id) {
-		List<Playlist> playlists = userService.getUserPlaylists(id);
-		if (!(playlists == null)) {
-			return ResponseEntity.status(HttpStatus.OK).body(playlists);
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User " + id + " not found."));
+				new ErrorDto(404, "User " + userId + " not found."));
 	}
 }

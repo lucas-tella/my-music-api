@@ -39,7 +39,6 @@ public class User implements UserDetails{
 	private List<Profiles> profiles = new ArrayList<>();
 
 	public User(NewUserDto dto) {
-		super();
 		this.userName = dto.getName();
 		this.email = dto.getEmail();
 		this.password = dto.getPassword();

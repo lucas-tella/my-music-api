@@ -5,6 +5,6 @@ import com.intuit.karate.junit5.Karate;
 public class KarateTestsRunner {
 	@Karate.Test
 	Karate runSignupTests() {
-		return Karate.run("ShouldPostTracks.feature").relativeTo(getClass());
+		return Karate.run().relativeTo(getClass());
 	}
 }

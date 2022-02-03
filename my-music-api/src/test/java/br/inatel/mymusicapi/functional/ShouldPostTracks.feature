@@ -149,10 +149,13 @@ Scenario: Should not add a track with invalid track id
     Then status 201
     And match response contains{'id':'#notnull','title':'#(playlistTitle)','description':'my first playlist','userId':'#(user.id)','tracks':[]}
     * def playlist = response
+    * def playlistId = playlist.id
     
+    * def expectedErrorMessage = 'Track 123asd456 not found or already added to playlist '+ playlistId + '.'
     Given path 'playlists/'+playlist.id+'/tracks'
     And request {'id': '123asd456'}
     And header Authorization = 'Bearer ' + token
     When method POST
     Then status 404
+    And match response contains {'status':404,'message':'#(expectedErrorMessage)'}
     

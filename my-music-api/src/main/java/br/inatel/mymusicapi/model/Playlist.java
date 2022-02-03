@@ -33,7 +33,6 @@ public class Playlist {
 	private List<String> trackIds;
 	
 	public Playlist(NewPlaylistDto dto) {
-		super();
 		this.title = dto.getTitle();
 		this.description = dto.getDescription();
 	}
