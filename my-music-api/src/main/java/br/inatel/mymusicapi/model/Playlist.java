@@ -17,17 +17,13 @@ import br.inatel.mymusicapi.dto.NewPlaylistDto;
 @Entity
 @Table(name = "playlist")
 public class Playlist {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
 	private String title;
 	private String description;
-
 	@ManyToOne(fetch = FetchType.EAGER)
 	private User user;
-	
 	@ElementCollection
 	@CollectionTable(name="playlist_tracks")
 	private List<String> trackIds;

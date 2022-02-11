@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PlaylistService {
-
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
@@ -30,6 +29,9 @@ public class PlaylistService {
 	
 	public PlaylistDto createNewPlaylist(NewPlaylistDto dto) {
 		Playlist playlist = new Playlist(dto);
+		if(dto.getUserId()==null) {
+			return null;
+		}
 		Optional<User> user = userRepository.findById(dto.getUserId());
 		if(user.isPresent()) {
 			User foundUser = user.get();
@@ -40,7 +42,6 @@ public class PlaylistService {
 		}
 		return null;
 	}
-	
 	public boolean isTitleValid (NewPlaylistDto dto) {
 		Optional <Playlist> optPlaylist = playlistRepository.findByTitle(dto.getTitle());
 		if(optPlaylist.isPresent()) {
@@ -48,19 +49,15 @@ public class PlaylistService {
 		}
 		return true;
 	}
-	
 	public List<PlaylistDto> getUserPlaylists(Long userId) {
 		Optional <User> user = userRepository.findById(userId);
 		if(user.isPresent()) {
 			List<Playlist> playlists = user.get().getPlaylists();
 			List<PlaylistDto> dto = new PlaylistDto().convert(playlists);
-			//essa conversão não está passando as TrackExtendedDto corretamente (ainda bem).
-			//deveria passar trackIds.
 			return dto;
 		}
 		return null;
 	}
-
 	public Long deletePlaylist(Long id) {
 			Optional<Playlist> playlist = playlistRepository.findById(id);
 			if (playlist.isPresent()) {
@@ -69,7 +66,6 @@ public class PlaylistService {
 			}
 			return null;
 	}
-	
 	public Playlist getPlaylist (Long id) {
 		Optional<Playlist> playlist = playlistRepository.findById(id);
 		if (playlist.isPresent()) {
@@ -77,27 +73,32 @@ public class PlaylistService {
 		}
 		return null;
 	}
-	
 	public PlaylistDto update(Long id, NewPlaylistDto dto) {
 		Optional<Playlist> playlist = playlistRepository.findById(id);
 		if (playlist.isPresent()) {
 			Playlist foundPlaylist = playlist.get();
-			foundPlaylist.setTitle(dto.getTitle());
-			foundPlaylist.setDescription(dto.getDescription());
-			savePlaylist(foundPlaylist);
-			PlaylistDto updatedDto = new PlaylistDto(foundPlaylist);
-			return updatedDto;
+			Optional<Playlist> existingOpPlaylist = playlistRepository.findByTitle(dto.getTitle());
+			Playlist existingPlaylist = existingOpPlaylist.get();
+			if(existingPlaylist.getTitle() != dto.getTitle()) {
+				foundPlaylist.setTitle(dto.getTitle());
+				foundPlaylist.setDescription(dto.getDescription());
+				savePlaylist(foundPlaylist);
+				PlaylistDto updatedDto = new PlaylistDto(foundPlaylist);
+				return updatedDto;
+			}
+			return null;
 		}
 		return null;
 	}
-	
 	public TrackExtendedDto addTrackToPlaylist (Long playlistId, TrackDto dto) {
 		if (dto.getId()!=null) {
 			Optional<Playlist> playlist = playlistRepository.findById(playlistId);
-			if (playlist.isPresent() && !playlist.get().getTrackIds().contains(dto.getId())) {
+			Playlist foundPlaylist = playlist.get();
+			if (playlist.isPresent() && !foundPlaylist.getTrackIds().contains(dto.getId())) {
 					TrackExtendedDto track = adapter.getTrackById(dto.getId());
-					if (!(track.getId()==null)) {
-						playlist.get().getTrackIds().add(dto.getId());
+					if (track.getId()!=null) {
+						foundPlaylist.getTrackIds().add(dto.getId());
+						savePlaylist(foundPlaylist);
 						return track;
 				}
 			}
@@ -105,10 +106,24 @@ public class PlaylistService {
 		}
 		return null;
 	}
+	public PlaylistDto deleteTracksFromPlaylist(Long playlistId, String trackId) {
+		Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+		if(!playlist.isPresent()) {
+			return null;
+		}
+		TrackDto dto = new TrackDto(trackId);
+		Playlist foundPlaylist = (playlist.get());
+		if (playlist.get().getTrackIds().contains(dto.getId())) {
+			foundPlaylist.getTrackIds().remove(dto.getId());
+			playlistRepository.save(foundPlaylist);
+			PlaylistDto playlistDto = new PlaylistDto(foundPlaylist);
+			return playlistDto;
+		}
+		return null;
+	}
 	public Playlist savePlaylist (Playlist playlist) {
 		return playlistRepository.save(playlist);
 	}
-	
 	public PlaylistDto getPlaylistTracks (Long id) {
 		Optional<Playlist> playlist = playlistRepository.findById(id);
 		if (playlist.isPresent()) {

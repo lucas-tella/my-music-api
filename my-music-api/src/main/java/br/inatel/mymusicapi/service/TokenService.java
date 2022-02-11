@@ -13,12 +13,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenService {
-
 	@Value("${mymusicapi.jwt.expiration}")
 	private String expiration;
 	@Value("${mymusicapi.jwt.secret}")
 	private String secret;
-	
 	public String generateToken(Authentication authentication) {
 		User loggedUser = (User) authentication.getPrincipal();
 		Date today = new Date();
@@ -31,7 +29,6 @@ public class TokenService {
 				.signWith(SignatureAlgorithm.HS256, secret)
 				.compact();
 	}
-
 	public boolean isTokenValid(String token) {
 		try {
 			Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token);
@@ -40,7 +37,6 @@ public class TokenService {
 			return false;
 		}
 	}
-
 	public Long getUserId(String token) {
 		Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
 		return 	Long.parseLong(claims.getSubject());

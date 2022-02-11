@@ -16,28 +16,23 @@ import br.inatel.mymusicapi.repository.UserRepository;
 import br.inatel.mymusicapi.service.TokenService;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
 	private TokenService tokenService;
 	private UserRepository userRepository;
 	public TokenAuthenticationFilter(TokenService tokenService, UserRepository userRepository) {
 		this.tokenService = tokenService;
 		this.userRepository = userRepository;
 	}
-
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String token = recoverToken(request);
-		System.out.println(token);
 		boolean validToken = tokenService.isTokenValid(token);
-		System.out.println(validToken);
 		if (validToken) {
 			authanticateClient(token);
 		}
 		filterChain.doFilter(request, response);
 	}
-
 	private void authanticateClient(String token) {
 		Long userId = tokenService.getUserId(token);
 		User user = userRepository.findById(userId).get();
@@ -45,7 +40,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 				user, null, user.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
-
 	private String recoverToken(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 		if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {

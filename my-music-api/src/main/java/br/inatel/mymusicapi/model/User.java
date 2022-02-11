@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,19 +23,15 @@ import br.inatel.mymusicapi.dto.NewUserDto;
 @Entity
 @Table(name = "user")
 public class User implements UserDetails{
-
 	private static final long serialVersionUID = 1L;
-
 	@Id	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Playlist> playlists;
-	
+	@Length(max = 15)
 	private String userName;
 	private String email;
 	private String password;
-	
 	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Profiles> profiles = new ArrayList<>();
 
