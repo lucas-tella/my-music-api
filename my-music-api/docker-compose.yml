@@ -4,9 +4,10 @@ services:
     image: mysql:8
     environment: 
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sa
+      MYSQL_DATABASE: bootdb
     ports: 
       - "3306:3306"
+      - "33060:33060"
     networks:
       - my-music-api-network
 
@@ -14,14 +15,15 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: .
-    image: lucas/my-music-api
+    image: lucastellaroli/mymusicapi
     container_name: my-music-api-container
     ports:
       - "8081:8081"
     networks:
       - my-music-api-network
-    environment: 
-        WAIT_HOSTS: mysql:3306 
+    environment:
+      WAIT_HOSTS: mysql:3306
+      SPRING_PROFILES_ACTIVE: prod
     depends_on: 
         - "db"
 

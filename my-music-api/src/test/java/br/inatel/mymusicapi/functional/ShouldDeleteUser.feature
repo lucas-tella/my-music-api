@@ -36,7 +36,7 @@ Scenario: Should not delete existing user if not authenticated
 
 		Given path 'users/'+user.id
 		When method DELETE
-		Then status 403
+		Then status 401
 		
 Scenario: Should display error message if user id is invalid
 		Given path 'users'

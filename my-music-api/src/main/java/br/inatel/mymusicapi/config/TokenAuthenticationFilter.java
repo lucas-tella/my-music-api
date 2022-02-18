@@ -29,11 +29,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 		String token = recoverToken(request);
 		boolean validToken = tokenService.isTokenValid(token);
 		if (validToken) {
-			authanticateClient(token);
+			authenticateClient(token);
 		}
 		filterChain.doFilter(request, response);
 	}
-	private void authanticateClient(String token) {
+	private void authenticateClient(String token) {
 		Long userId = tokenService.getUserId(token);
 		User user = userRepository.findById(userId).get();
 		UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

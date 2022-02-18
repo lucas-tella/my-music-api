@@ -3,24 +3,23 @@ info:
   title: My Music API
   description: This is an REST API for creating and managing users and their music playlists, through a music library powered by an external API, by Deezer.
   version: 1.0.1
-  
   contact:
     name: Lucas F Tellaroli
     email: lucas.tellaroli@inatel.br
   license:
-    name: "License GPLv3"
+    name: License GPLv3
     url: https://www.gnu.org/licenses/gpl-3.0.html
 externalDocs:
   description: Detailed Documentation
-  url: https://mockapi.io #inserir .docx no sharepoint, disponibilizar link
-
-servers: 
+  url: https://mockapi.io
+servers:
   - url: http://localhost:8081
     description: My Music API base url
-    
 paths:
   /users:
     post:
+      tags:
+      - Users
       requestBody:
         content:
           application/json:
@@ -34,74 +33,80 @@ paths:
                 password:
                   type: string
       responses:
-        201:
+        '201':
           description: Created, success
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   name:
                     type: string
                   email:
                     type: string
-        400:
+        '400':
           description: Bad request
-        403:
+        '403':
           description: Forbidden, invalid email
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorDto"
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
   /users/{id}:
     parameters:
-    - name: id
-      in: path
-      schema:
-        type: number
-      required: true
+      - name: id
+        in: path
+        schema:
+          type: number
+        required: true
     get:
+      tags:
+      - Users
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   name:
                     type: string
                   email:
                     type: string
-        404:
+        '404':
           description: User not found (does not exist)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorDto"
+                $ref: '#/components/schemas/ErrorDto'
     delete:
+      tags:
+      - Users
       security:
-      - auth: []
+        - auth: []
       responses:
-        200:
+        '200':
           description: Success, user deleted
           content:
             text:
-              example: "User {id} deleted."
-        401:
+              example: User {id} deleted.
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        404:
+        '404':
           description: User not found (does not exist)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorDto"
+                $ref: '#/components/schemas/ErrorDto'
   /login:
     post:
+      tags:
+      - Users
       requestBody:
         content:
           application/json:
@@ -112,7 +117,7 @@ paths:
                 password:
                   type: string
       responses:
-        200:
+        '200':
           description: Success, token received
           content:
             application/json:
@@ -122,157 +127,168 @@ paths:
                     type: string
                   type:
                     type: string
-                    example: "Bearer"
-        400:
+                    example: Bearer
+        '400':
           description: Invalid credentials
   /playlists:
     post:
+      tags:
+      - Playlists
       security:
-      - auth: []
+        - auth: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewPlaylistDto"
+              $ref: '#/components/schemas/NewPlaylistDto'
       responses:
-        201:
+        '201':
           description: Created, success
           content:
             application/json:
-                schema:
-                  $ref: '#/components/schemas/PlaylistDto'
-        401:
+              schema:
+                $ref: '#/components/schemas/PlaylistDto'
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        403:
+        '403':
           description: Forbidden, either the title is already being use or the userId is invalid.
-        404:
+        '404':
           description: User id not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorDto"
+                $ref: '#/components/schemas/ErrorDto'
   /playlists/user/{id}:
     parameters:
-    - name: id
-      in: path
-      schema:
-        type: number
-      required: true
-      
+      - name: id
+        in: path
+        schema:
+          type: number
+        required: true
     get:
+      tags:
+      - Playlists
       security:
-      - auth: []
+        - auth: []
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: "#/components/schemas/PlaylistDto"
-        401:
+                items:
+                  $ref: '#/components/schemas/PlaylistDto'
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        404:
+        '404':
           description: User not found (does not exist)
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorDto"
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
   /playlists/{id}:
     parameters:
-    - name: id
-      in: path
-      schema:
-        type: number
-      required: true
+      - name: id
+        in: path
+        schema:
+          type: number
+        required: true
     put:
+      tags:
+      - Playlists
       security:
-      - auth: []
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/NewPlaylistDto"
-      responses:
-        200:
-          description: Success, playlist updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PlaylistDto"
-        401:
-          description: Not authorazied, please insert valid token in authentication header
-        403:
-          description: Forbidden, invalid user id
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorDto"
-        404:
-          description: Playlist id not found
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorDto"
-    delete:
-      security:
-      - auth: []      
-      responses:
-        200:
-          description: Success, Playlist deleted from database repository
-          content:
-            text:
-              example: "Playlist {id} deleted."
-        401:
-          description: Not authorazied, please insert valid token in authentication header
-        404:
-          description: Playlist id not found
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorDto"
-  /playlists/{id}/tracks:
-    parameters:
-    - name: id
-      in: path
-      schema:
-        type: number
-      required: true
-    post:
-      security:
-      - auth: []
+        - auth: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TrackDto"
+              $ref: '#/components/schemas/NewPlaylistDto'
       responses:
-        200:
+        '200':
+          description: Success, playlist updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaylistDto'
+        '401':
+          description: Not authorazied, please insert valid token in authentication header
+        '403':
+          description: Forbidden, invalid user id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        '404':
+          description: Playlist id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+    delete:
+      tags:
+      - Playlists
+      security:
+        - auth: []
+      responses:
+        '200':
+          description: Success, Playlist deleted from database repository
+          content:
+            text:
+              example: Playlist {id} deleted.
+        '401':
+          description: Not authorazied, please insert valid token in authentication header
+        '404':
+          description: Playlist id not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+  /playlists/{id}/tracks:
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: number
+        required: true
+    post:
+      tags:
+      - Tracks
+      security:
+        - auth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackDto'
+      responses:
+        '200':
           description: Success, track added to the playlist
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TrackExtendedDto"
-        400:
+                $ref: '#/components/schemas/TrackExtendedDto'
+        '400':
           description: Track not found or already added to this playlist
-        401:
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        404:
+        '404':
           description: Playlist not found
     get:
+      tags:
+      - Tracks
       security:
-      - auth: []
+        - auth: []
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/PlaylistDto"
-        401:
+              schema:
+                $ref: '#/components/schemas/PlaylistDto'
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        404:
+        '404':
           description: Playlist not found
   /playlists/{id}/tracks/{trackId}:
     parameters:
@@ -287,102 +303,106 @@ paths:
           type: string
         required: true
     delete:
+      tags:
+      - Tracks
       security:
-      - auth: []
+        - auth: []
       responses:
-        200:
+        '200':
           description: Success, track deleted from playlist
           content:
             text:
-              example: "Track {trackId} deleted from playlist {id}."
-        401: 
+              example: Track {trackId} deleted from playlist {id}.
+        '401':
           description: Not authorazied, please insert valid token in authentication header
-        404:
+        '404':
           description: Either playlist or track could not be found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorDto"
-
+                $ref: '#/components/schemas/ErrorDto'
+                
+tags:
+  - name: Users
+    description: API calls to user objects
+  - name: Playlists
+    description: API calls to playlist objects
+  - name: Tracks
+    description: API calls to track objects
 components:
-    schemas:
-      ErrorDto:
-        type: object
-        properties:
-          status:
-            type: integer
-          message:
-            type: string
-      
-      NewPlaylistDto:
-        type: object
-        properties:
-          title:
-            type: string
-          description:
-            type: string
-          userId:
-            type: number
-            
-      PlaylistDto:
-        type: object
-        properties:
-          id:
-            type: number
-          title:
-            type: string
-          description:
-            type: string
-          userId:
-            type: number
-          tracks:
-            type: array
-            items:
-              properties:
-                id:
-                  type: number
-                title:
-                  type: string
-                duration:
-                  type: number
-                artist:
-                  type: object
-                  properties:
-                      name:
-                        type: string
-                album:
-                  type: object
-                  properties:
-                      title:
-                        type: string
-              
-      TrackDto:
-        type: object
-        properties:
-          id:
-            type: number
-              
-      TrackExtendedDto:
-        type: object
-        properties:
-          id:
-            type: number
-          title:
-            type: string
-          duration:
-            type: number
-          artist:
-            type: object
+  schemas:
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+    NewPlaylistDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        userId:
+          type: number
+    PlaylistDto:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        userId:
+          type: number
+        tracks:
+          type: array
+          items:
             properties:
-                name:
-                  type: string
-          album:
-            type: object
-            properties:
-                title:
-                  type: string
-    
-    securitySchemes:
-      auth:
-        type: http
-        scheme: bearer
+              id:
+                type: number
+              title:
+                type: string
+              duration:
+                type: number
+              artist:
+                type: object
+                properties:
+                  name:
+                    type: string
+              album:
+                type: object
+                properties:
+                  title:
+                    type: string
+    TrackDto:
+      type: object
+      properties:
+        id:
+          type: number
+    TrackExtendedDto:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        duration:
+          type: number
+        artist:
+          type: object
+          properties:
+            name:
+              type: string
+        album:
+          type: object
+          properties:
+            title:
+              type: string
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer

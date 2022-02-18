@@ -39,7 +39,7 @@ Scenario: Should register a new user and a new playlist and check if we can find
     Then status 200
     And match response contains{'id':'#notnull','title':'#(playlistTitle)','description':'my first playlist','userId':'#(user.id)','tracks':[]}
     
- Scenario: Should not register a new playlist if not authenticated
+Scenario: Should not register a new playlist if not authenticated
     Given path 'users'
     And request {"name": 'Lucas', "email": '#(userEmail)', "password": '12345678'}
     When method POST
@@ -54,9 +54,9 @@ Scenario: Should register a new user and a new playlist and check if we can find
     Given path 'playlists'
     And request {'title':'#(playlistTitle)','description':'my first playlist','userId':'#(user.id)'}
     When method POST
-    Then status 403
+    Then status 401
  
-  Scenario: Should not register a new playlist with invalid title
+Scenario: Should not register a new playlist with invalid title
     Given path 'users'
     And request {"name": 'Lucas', "email": '#(userEmail)', "password": '12345678'}
     When method POST

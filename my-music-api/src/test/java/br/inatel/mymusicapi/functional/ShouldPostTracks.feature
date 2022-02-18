@@ -77,7 +77,7 @@ Scenario: Should not add a track to a playlist without authentication
     Given path 'playlists/'+playlist.id+'/tracks'
     And request {'id': '1280165222'}
     When method GET
-    Then status 403
+    Then status 401
 
 Scenario: Should not add a track with invalid playlist id
     Given path 'users'
@@ -152,10 +152,11 @@ Scenario: Should not add a track with invalid track id
     * def playlistId = playlist.id
     
     * def expectedErrorMessage = 'Track 123asd456 not found or already added to playlist '+ playlistId + '.'
+    
     Given path 'playlists/'+playlist.id+'/tracks'
     And request {'id': '123asd456'}
     And header Authorization = 'Bearer ' + token
     When method POST
-    Then status 404
-    And match response contains {'status':404,'message':'#(expectedErrorMessage)'}
+    Then status 400
+    And match response contains {'status':400,'message':'#(expectedErrorMessage)'}
     

@@ -25,6 +25,10 @@ public class UserController {
 	private UserService userService;
 	@PostMapping
 	public ResponseEntity<?> postUser(@RequestBody @Valid NewUserDto dto) {
+		if(dto.getName().length()>15) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					new ErrorDto(400, "The user name must have under 15 characters."));
+		}
 		if (userService.isEmailValid(dto)) {
 			if(userService.isPasswordValid(dto)) {
 				UserDto newUser = userService.createNewUser(dto);

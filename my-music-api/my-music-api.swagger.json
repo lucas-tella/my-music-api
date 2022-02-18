@@ -26,6 +26,9 @@
   "paths": {
     "/users": {
       "post": {
+        "tags": [
+          "Users"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -96,6 +99,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Users"
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -131,6 +137,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Users"
+        ],
         "security": [
           {
             "auth": []
@@ -163,6 +172,9 @@
     },
     "/login": {
       "post": {
+        "tags": [
+          "Users"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -206,6 +218,9 @@
     },
     "/playlists": {
       "post": {
+        "tags": [
+          "Playlists"
+        ],
         "security": [
           {
             "auth": []
@@ -262,6 +277,9 @@
         }
       ],
       "get": {
+        "tags": [
+          "Playlists"
+        ],
         "security": [
           {
             "auth": []
@@ -309,6 +327,9 @@
         }
       ],
       "put": {
+        "tags": [
+          "Playlists"
+        ],
         "security": [
           {
             "auth": []
@@ -360,6 +381,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Playlists"
+        ],
         "security": [
           {
             "auth": []
@@ -402,6 +426,9 @@
         }
       ],
       "post": {
+        "tags": [
+          "Tracks"
+        ],
         "security": [
           {
             "auth": []
@@ -439,6 +466,9 @@
         }
       },
       "get": {
+        "tags": [
+          "Tracks"
+        ],
         "security": [
           {
             "auth": []
@@ -484,6 +514,9 @@
         }
       ],
       "delete": {
+        "tags": [
+          "Tracks"
+        ],
         "security": [
           {
             "auth": []
@@ -515,6 +548,20 @@
       }
     }
   },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API calls to user objects"
+    },
+    {
+      "name": "Playlists",
+      "description": "API calls to playlist objects"
+    },
+    {
+      "name": "Tracks",
+      "description": "API calls to track objects"
+    }
+  ],
   "components": {
     "schemas": {
       "ErrorDto": {

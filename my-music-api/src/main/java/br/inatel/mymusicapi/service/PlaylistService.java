@@ -106,21 +106,6 @@ public class PlaylistService {
 		}
 		return null;
 	}
-	public PlaylistDto deleteTracksFromPlaylist(Long playlistId, String trackId) {
-		Optional<Playlist> playlist = playlistRepository.findById(playlistId);
-		if(!playlist.isPresent()) {
-			return null;
-		}
-		TrackDto dto = new TrackDto(trackId);
-		Playlist foundPlaylist = (playlist.get());
-		if (playlist.get().getTrackIds().contains(dto.getId())) {
-			foundPlaylist.getTrackIds().remove(dto.getId());
-			playlistRepository.save(foundPlaylist);
-			PlaylistDto playlistDto = new PlaylistDto(foundPlaylist);
-			return playlistDto;
-		}
-		return null;
-	}
 	public Playlist savePlaylist (Playlist playlist) {
 		return playlistRepository.save(playlist);
 	}
@@ -134,6 +119,21 @@ public class PlaylistService {
 				dto.getTracks().add(track);
 			}
 			return dto;
+		}
+		return null;
+	}
+	public PlaylistDto deleteTracksFromPlaylist(Long playlistId, String trackId) {
+		Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+		if(!playlist.isPresent()) {
+			return null;
+		}
+		TrackDto dto = new TrackDto(trackId);
+		Playlist foundPlaylist = (playlist.get());
+		if (playlist.get().getTrackIds().contains(dto.getId())) {
+			foundPlaylist.getTrackIds().remove(dto.getId());
+			playlistRepository.save(foundPlaylist);
+			PlaylistDto playlistDto = new PlaylistDto(foundPlaylist);
+			return playlistDto;
 		}
 		return null;
 	}

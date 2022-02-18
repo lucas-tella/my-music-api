@@ -20,14 +20,15 @@ import br.inatel.mymusicapi.service.TokenService;
 
 @EnableWebSecurity
 @Configuration
-public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
+public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AuthenticationService authenticationService;
 	@Autowired
 	private TokenService tokenService;
 	@Autowired
-	private UserRepository userRepository; 
-	@Override  @Bean
+	private UserRepository userRepository;
+	@Override
+	@Bean
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
 	}
@@ -41,12 +42,14 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.POST, "/users").permitAll()
 		.antMatchers(HttpMethod.GET, "/users/*").permitAll()
 		.antMatchers(HttpMethod.POST, "/login").permitAll()
+//        .antMatchers("/v2/api-docs","/swagger-resources/**","/swagger-ui.html","/webjars/**" ,"/swagger.json")
+//            .permitAll()
 		.anyRequest().authenticated()
-		.and().csrf().disable()
-		.exceptionHandling().authenticationEntryPoint(new Http401AuthenticationEntryPoint())
-		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and().addFilterBefore(new TokenAuthenticationFilter(tokenService, userRepository),
-				UsernamePasswordAuthenticationFilter.class);
+		.and().csrf().disable().exceptionHandling()
+		.authenticationEntryPoint(new Http401AuthenticationEntryPoint()).and().sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+		.addFilterBefore(new TokenAuthenticationFilter(tokenService, userRepository),
+						UsernamePasswordAuthenticationFilter.class);
 	}
 	@Override
 	public void configure(WebSecurity web) throws Exception {
