@@ -11,4 +11,5 @@ import br.inatel.mymusicapi.model.Playlist;
 public interface PlaylistRepository extends JpaRepository<Playlist, Long>{
 	Optional<Playlist> findByTitle(String title);
 	Optional<Playlist> findByUserId(Long id);
+	Optional<Playlist> findById (Long id);
 }

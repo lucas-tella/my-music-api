@@ -1,7 +1,6 @@
 package br.inatel.mymusicapi.unit;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
 
@@ -16,17 +15,14 @@ import br.inatel.mymusicapi.repository.PlaylistRepository;
 import br.inatel.mymusicapi.service.PlaylistService;
 import br.inatel.mymusicapi.service.UserService;
 
-
 @SpringBootTest @ActiveProfiles("test")
 class PlaylistServiceTest {
-
 	@Autowired
 	UserService userService;
 	@Autowired
 	PlaylistService playlistService;
 	@Autowired
 	PlaylistRepository repository;
-	
 	@Test
 	void shouldSavePlaylist() {
 		NewPlaylistDto dto = new NewPlaylistDto("title", "description", (long) 1);

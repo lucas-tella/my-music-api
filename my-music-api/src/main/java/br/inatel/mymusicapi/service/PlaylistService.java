@@ -74,19 +74,13 @@ public class PlaylistService {
 		return null;
 	}
 	public PlaylistDto update(Long id, NewPlaylistDto dto) {
-		Optional<Playlist> playlist = playlistRepository.findById(id);
-		if (playlist.isPresent()) {
-			Playlist foundPlaylist = playlist.get();
-			Optional<Playlist> existingOpPlaylist = playlistRepository.findByTitle(dto.getTitle());
-			Playlist existingPlaylist = existingOpPlaylist.get();
-			if(existingPlaylist.getTitle() != dto.getTitle()) {
-				foundPlaylist.setTitle(dto.getTitle());
-				foundPlaylist.setDescription(dto.getDescription());
-				savePlaylist(foundPlaylist);
-				PlaylistDto updatedDto = new PlaylistDto(foundPlaylist);
-				return updatedDto;
-			}
-			return null;
+		Playlist foundPlaylist = getPlaylist(id);
+		if(foundPlaylist!=null) {
+			foundPlaylist.setTitle(dto.getTitle());
+			foundPlaylist.setDescription(dto.getDescription());
+			savePlaylist(foundPlaylist);
+			PlaylistDto updatedDto = new PlaylistDto(foundPlaylist);
+			return updatedDto;
 		}
 		return null;
 	}

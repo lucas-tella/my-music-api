@@ -1,5 +1,5 @@
-Feature: Registering a new User and new Playlist
-    
+Feature: Adding Track to Playlist
+
 Background: 
 		* url 'http://localhost:8081/'
 		* def random = function(){return java.lang.System.currentTimeMillis()}

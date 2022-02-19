@@ -61,6 +61,7 @@ public class PlaylistController {
 				new ErrorDto(404, "User Id " + id + " not found."));
 	}
 	@PutMapping(path="/{id}")
+	@Transactional
 	public ResponseEntity<?> updatePlaylist(@PathVariable Long id,
 			@RequestBody @Valid NewPlaylistDto dto) {
 		if(dto.getUserId()!=null) {
@@ -70,9 +71,9 @@ public class PlaylistController {
 			}
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
 					new ErrorDto(404, "Playlist Id " + id + " not found."));	
-			}
+		}
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ErrorDto(403, "Invalid User Id."));	
+				new ErrorDto(404, "Invalid User Id."));	
 		}
 	@DeleteMapping(path="/{id}")
 	@CacheEvict(value="listPlaylistTracksById", allEntries = true)

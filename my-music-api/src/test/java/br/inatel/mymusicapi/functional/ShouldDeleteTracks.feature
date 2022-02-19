@@ -1,5 +1,5 @@
 Feature: Deleting track from playlist
-    
+
 Background: 
 		* url 'http://localhost:8081/'
 		* def random = function(){return java.lang.System.currentTimeMillis()}

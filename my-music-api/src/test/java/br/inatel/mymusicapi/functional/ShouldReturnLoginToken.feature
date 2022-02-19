@@ -1,4 +1,4 @@
-Feature: Login
+Feature: Login and authentication
 
 Background:
 		* url 'http://localhost:8081/'

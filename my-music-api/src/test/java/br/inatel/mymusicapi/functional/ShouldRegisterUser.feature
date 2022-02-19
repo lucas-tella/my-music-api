@@ -1,4 +1,4 @@
-Feature: Registering a new User good and bad scenarios
+Feature: Registering a new User
     
 Background: 
 		* url 'http://localhost:8081/'
