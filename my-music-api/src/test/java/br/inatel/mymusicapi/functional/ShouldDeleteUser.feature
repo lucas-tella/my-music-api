@@ -1,7 +1,7 @@
 Feature: Deleting user
 
 Background: 
-    * url 'http://localhost:8081/'
+		* url baseUrl
     * def random = function(){return java.lang.System.currentTimeMillis()}
 		* def userEmail = 'qa.delete'+random()+'@test.com'
 

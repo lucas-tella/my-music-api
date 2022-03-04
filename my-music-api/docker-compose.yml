@@ -7,7 +7,6 @@ services:
       MYSQL_DATABASE: bootdb
     ports: 
       - "3306:3306"
-      - "33060:33060"
     networks:
       - my-music-api-network
 

@@ -1,7 +1,7 @@
 Feature: Registering a new User and new Playlist and then Deleting it
 
 Background: 
-		* url 'http://localhost:8081/'
+		* url baseUrl
 		* def random = function(){return java.lang.System.currentTimeMillis()}
 		* def userEmail = 'qa.playlist.delete'+random()+'@test.com'
 		* def playlistTitle = 'title'+random()
@@ -14,16 +14,17 @@ Scenario: Should register a new user and a new playlist, then delete it
     And match response contains {"id": '#notnull', "name": 'Lucas', "email": '#(userEmail)'}
     * def user = response
     
-		Given path 'users/'+user.id
-    When method GET
-    Then status 200
-    
 		Given path 'login'
     And request {'email': '#(userEmail)', 'password': '12345678'}
     When method POST
     Then status 200
     And match response contains{'token': '#notnull','type':'Bearer'}
     * def token = response.token
+    
+		Given path 'users/'+user.id
+		And header Authorization = 'Bearer ' + token		
+    When method GET
+    Then status 200
     
     Given path 'playlists'
 		And header Authorization = 'Bearer ' + token
@@ -47,7 +48,15 @@ Scenario: Should register a new user and a new playlist, then delete it
     And match response contains {"id": '#notnull', "name": 'Lucas', "email": '#(userEmail)'}
     * def user = response
     
+		Given path 'login'
+    And request {'email': '#(userEmail)', 'password': '12345678'}
+    When method POST
+    Then status 200
+    And match response contains{'token': '#notnull','type':'Bearer'}
+    * def token = response.token
+    
 		Given path 'users/'+user.id
+		And header Authorization = 'Bearer ' + token		
     When method GET
     Then status 200
     
@@ -63,17 +72,18 @@ Scenario: Should display error message if playlist id is invalid
     Then status 201
     And match response contains {"id": '#notnull', "name": 'Lucas', "email": '#(userEmail)'}
     * def user = response
-    
-		Given path 'users/'+user.id
-    When method GET
-    Then status 200
-    
+		
 		Given path 'login'
     And request {'email': '#(userEmail)', 'password': '12345678'}
     When method POST
     Then status 200
     And match response contains{'token': '#notnull','type':'Bearer'}
     * def token = response.token
+    
+		Given path 'users/'+user.id
+		And header Authorization = 'Bearer ' + token		
+    When method GET
+    Then status 200
     
     Given path 'playlists'
 		And header Authorization = 'Bearer ' + token

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import br.inatel.mymusicapi.adapter.ExternalApiAdapter;
@@ -16,7 +17,8 @@ import br.inatel.mymusicapi.model.User;
 import br.inatel.mymusicapi.repository.PlaylistRepository;
 import br.inatel.mymusicapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlaylistService {
@@ -49,6 +51,15 @@ public class PlaylistService {
 		}
 		return true;
 	}
+//	public List<PlaylistDto> getUserPlaylists(Long userId, Page pageable) {
+//		Optional <User> user = userRepository.findByIdContaining(userId, pageable);
+//		if(user.isPresent()) {
+//			List<Playlist> playlists = user.get().getPlaylists();
+//			List<PlaylistDto> dto = new PlaylistDto().convert(playlists);
+//			return dto;
+//		}
+//		return null;
+//	}
 	public List<PlaylistDto> getUserPlaylists(Long userId) {
 		Optional <User> user = userRepository.findById(userId);
 		if(user.isPresent()) {
@@ -89,11 +100,12 @@ public class PlaylistService {
 			Optional<Playlist> playlist = playlistRepository.findById(playlistId);
 			Playlist foundPlaylist = playlist.get();
 			if (playlist.isPresent() && !foundPlaylist.getTrackIds().contains(dto.getId())) {
-					TrackExtendedDto track = adapter.getTrackById(dto.getId());
-					if (track.getId()!=null) {
-						foundPlaylist.getTrackIds().add(dto.getId());
-						savePlaylist(foundPlaylist);
-						return track;
+				TrackExtendedDto track = adapter.getTrackById(dto.getId());
+				if (track.getId()!=null) {
+					foundPlaylist.getTrackIds().add(dto.getId());
+					savePlaylist(foundPlaylist);
+					log.info("New track added to playlist.");
+					return track;
 				}
 			}
 			return null;
@@ -101,6 +113,7 @@ public class PlaylistService {
 		return null;
 	}
 	public Playlist savePlaylist (Playlist playlist) {
+		log.info("Saving playlist...");
 		return playlistRepository.save(playlist);
 	}
 	public PlaylistDto getPlaylistTracks (Long id) {
@@ -127,6 +140,7 @@ public class PlaylistService {
 			foundPlaylist.getTrackIds().remove(dto.getId());
 			playlistRepository.save(foundPlaylist);
 			PlaylistDto playlistDto = new PlaylistDto(foundPlaylist);
+			log.info("Track deleted.");
 			return playlistDto;
 		}
 		return null;

@@ -40,10 +40,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 		.antMatchers(HttpMethod.POST, "/users").permitAll()
-		.antMatchers(HttpMethod.GET, "/users/*").permitAll()
 		.antMatchers(HttpMethod.POST, "/login").permitAll()
-//        .antMatchers("/v2/api-docs","/swagger-resources/**","/swagger-ui.html","/webjars/**" ,"/swagger.json")
-//            .permitAll()
+//	    .antMatchers("/v2/api-docs","/swagger-resources/**","/swagger-ui.html","/webjars/**" ,"/swagger.json")
+//	        .permitAll()
 		.anyRequest().authenticated()
 		.and().csrf().disable().exceptionHandling()
 		.authenticationEntryPoint(new Http401AuthenticationEntryPoint()).and().sessionManagement()

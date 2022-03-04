@@ -16,7 +16,8 @@ import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.model.User;
 import br.inatel.mymusicapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -29,6 +30,7 @@ public class UserService {
 			User user = new User(dto);
 			user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 			User newUser = repository.save(user);
+			log.info("New user added to database repository.");
 			return new UserDto(newUser);
 		}
 		return null;
@@ -36,9 +38,12 @@ public class UserService {
 	
 	public boolean isEmailValid(NewUserDto dto) {
 		Optional<User> existingEmail = repository.findByEmail(dto.getEmail());
+		log.info("Validating email.");
 		if (!existingEmail.isPresent() && isEmailAddressValid(dto)) {
+			log.info("Email is valid.");
 			return true;
 		}
+		log.info("Email is invalid.");
 		return false;
 	}
 
@@ -55,6 +60,7 @@ public class UserService {
 	
 	public boolean isPasswordValid(NewUserDto dto) {
 		if (dto.getPassword().toString().length()==8) {
+			log.info("Validating password.");
 			return true;
 		}
 		return false;
@@ -64,6 +70,7 @@ public class UserService {
 		Optional<User> user = repository.findById(id);
 		if (user.isPresent()) {
 			repository.deleteById(id);
+			log.info("User deleted from database repository.");
 			return user.get().getId();
 		}
 		return null;
@@ -71,6 +78,7 @@ public class UserService {
 
 	public UserDto getUser(Long id) {
 		Optional<User> user = repository.findById(id);
+		log.info("Searching for user in repository...");
 		if (user.isPresent()) {
 			return new UserDto(user.get());
 		}
@@ -80,6 +88,7 @@ public class UserService {
 
 	public List<Playlist> getUserPlaylists (Long id) {
 		Optional<User> user = repository.findById(id);
+		log.info("Searching for user playlist's in repository...");
 		if(user.isPresent()) {
 			User foundUser = user.get();
 			return foundUser.getPlaylists();

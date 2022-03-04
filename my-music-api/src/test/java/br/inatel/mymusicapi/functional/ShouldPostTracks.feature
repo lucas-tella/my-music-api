@@ -1,7 +1,7 @@
 Feature: Adding Track to Playlist
 
 Background: 
-		* url 'http://localhost:8081/'
+		* url baseUrl
 		* def random = function(){return java.lang.System.currentTimeMillis()}
 		* def userEmail = 'qa.playlist'+random()+'@test.com'
 		* def playlistTitle = 'title'+random()

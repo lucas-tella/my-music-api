@@ -1,7 +1,7 @@
 Feature: Deleting track from playlist
 
 Background: 
-		* url 'http://localhost:8081/'
+		* url baseUrl
 		* def random = function(){return java.lang.System.currentTimeMillis()}
 		* def userEmail = 'qa.playlist'+random()+'@test.com'
 		* def playlistTitle = 'title'+random()
@@ -28,7 +28,6 @@ Scenario: Should register a new user, a new playlist, add a track to it and then
     Then status 201
     And match response contains{'id':'#notnull','title':'#(playlistTitle)','description':'my first playlist','userId':'#(user.id)','tracks':[]}
     * def playlist = response
-    
     * def trackId = 1280165222
     
     Given path 'playlists/'+playlist.id+'/tracks'

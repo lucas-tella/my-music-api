@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import br.inatel.mymusicapi.dto.LoginDto;
 import br.inatel.mymusicapi.dto.TokenDto;
 import br.inatel.mymusicapi.service.TokenService;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @RestController
 @RequestMapping("/login")
 public class AuthenticationController {
@@ -32,6 +33,7 @@ public class AuthenticationController {
 			String token = tokenService.generateToken(authentication);
 			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
 		} catch (AuthenticationException e) {
+			log.info("Invalid credentials.");
 			return ResponseEntity.badRequest().build();
 		}
 	}

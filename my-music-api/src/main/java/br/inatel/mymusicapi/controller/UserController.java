@@ -17,7 +17,8 @@ import br.inatel.mymusicapi.dto.ErrorDto;
 import br.inatel.mymusicapi.dto.NewUserDto;
 import br.inatel.mymusicapi.dto.UserDto;
 import br.inatel.mymusicapi.service.UserService;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @RestController
 @RequestMapping (value = "/users")
 public class UserController {
@@ -32,6 +33,7 @@ public class UserController {
 		if (userService.isEmailValid(dto)) {
 			if(userService.isPasswordValid(dto)) {
 				UserDto newUser = userService.createNewUser(dto);
+				log.info("New user successfuly created.");
 				return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
 			}
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
@@ -53,6 +55,7 @@ public class UserController {
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		Long deletedUserId = userService.deleteUser(id);
 		if (!(deletedUserId==null)) {
+			log.info("User successfuly deleted.");
 			return ResponseEntity.status(HttpStatus.OK).body("User " + id + " deleted.");
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
