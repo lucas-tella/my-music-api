@@ -14,4 +14,4 @@ Once the mysql database container is up and running, you can run the My Music AP
 For information about API's basic use and requests, you can reffer to the swagger documentation: 
 open swagger UI live demo (*https://petstore.swagger.io/?_ga=2.221756827.2018432814.1644948099-1563697491.1631281809*), change the document to "https://lucas-tella.github.io" and hit EXPLORE. The My Music API swagger documentation is now ready to use.
 
-For further information about this API, reffer to the extended documentation file **my-music-api.documentation.pdf** inside the documentattion folder in this repository.
+For further information about this API, reffer to the extended documentation file **my-music-api.documentation.pdf** inside the documentation folder in this repository.
