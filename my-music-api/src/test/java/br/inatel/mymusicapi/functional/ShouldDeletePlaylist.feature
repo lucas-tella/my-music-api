@@ -94,14 +94,15 @@ Scenario: Should display error message if playlist id is invalid
     * def playlist = response
     
     * def random = random()
-    * def expectedErrorMessage = 'Playlist '+random+' not found.'
+    * def expectedErrorMessage = 'Playlist '+random()+' not found.'
+    
     Given path 'playlists/'+random
 		And header Authorization = 'Bearer ' + token
 		When method DELETE
 		Then status 404
     And match response contains{'status':404,'message':'#(expectedErrorMessage)'}
 		
-		Given path 'playlists/'+'asd'
+		Given path 'playlists/'+'genericString'
 		And header Authorization = 'Bearer ' + token
 		When method DELETE
 		Then status 400

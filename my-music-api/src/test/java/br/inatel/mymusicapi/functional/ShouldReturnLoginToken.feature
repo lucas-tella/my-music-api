@@ -67,25 +67,25 @@ Scenario: Should not authenticate a user with a invalid token
     When method GET
     Then status 401
     
-Scenario: Should not authenticate a user with a expired token
-		Given path 'users'
-		And request {'name': 'Lucas', 'email': '#(userEmail)', 'password': '12345678'}
-    When method POST
-    Then status 201
-    And match response contains {'id': '#notnull', 'name': Lucas, 'email': '#(userEmail)'}
-    * def user = response
-    
-    Given path 'login'
-    And request {'email': '#(userEmail)', 'password': '12345678'}
-    When method POST
-    Then status 200
-    And match response contains{'token': '#notnull','type':'Bearer'}
-    * def token = response.token
-
+#Scenario: Should not authenticate a user with a expired token
+#		Given path 'users'
+#		And request {'name': 'Lucas', 'email': '#(userEmail)', 'password': '12345678'}
+    #When method POST
+    #Then status 201
+    #And match response contains {'id': '#notnull', 'name': Lucas, 'email': '#(userEmail)'}
+    #* def user = response
+    #
+    #Given path 'login'
+    #And request {'email': '#(userEmail)', 'password': '12345678'}
+    #When method POST
+    #Then status 200
+    #And match response contains{'token': '#notnull','type':'Bearer'}
+    #* def token = response.token
+#
 #		* call delay()
-    
-    Given path 'users/'+user.id
-		And header Authorization = 'Bearer '+token  
-		When method GET
-    Then status 401
+    #
+    #Given path 'users/'+user.id
+#		And header Authorization = 'Bearer '+token  
+#		When method GET
+    #Then status 401
     

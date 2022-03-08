@@ -119,9 +119,14 @@ Scenario: Should not register a new playlist with invalid user id
     When method GET
     Then status 200
     
+    * def invalidId = random()
+    * def expectedErrorMessage = 'User id '+invalidId+' not found.'
+    
     Given path 'playlists'
 		And header Authorization = 'Bearer ' + token
-    And request {'title':'#(playlistTitle)','description':'my first playlist','userId':'#(random())'}
+    And request {'title':'#(playlistTitle)','description':'my first playlist','userId':'#(invalidId)'}
     When method POST
     Then status 404
+    And match response contains{'status':404,'message':'#(expectedErrorMessage)'}
+    
     
