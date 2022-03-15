@@ -21,21 +21,25 @@ import br.inatel.mymusicapi.service.TokenService;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
+	
 	@Autowired
 	private AuthenticationService authenticationService;
 	@Autowired
 	private TokenService tokenService;
 	@Autowired
 	private UserRepository userRepository;
+	
 	@Override
 	@Bean
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
 	}
+	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(authenticationService).passwordEncoder(new BCryptPasswordEncoder());
 	}
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
@@ -50,6 +54,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 		.addFilterBefore(new TokenAuthenticationFilter(tokenService, userRepository),
 						UsernamePasswordAuthenticationFilter.class);
 	}
+	
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 	}

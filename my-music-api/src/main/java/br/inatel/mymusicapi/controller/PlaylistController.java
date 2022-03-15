@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,31 +30,23 @@ import br.inatel.mymusicapi.dto.TrackExtendedDto;
 import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.service.PlaylistService;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RestController
 @RequestMapping("/playlists")
 public class PlaylistController {
+	
 	@Autowired 
 	private PlaylistService playlistService;
+	
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> postPlaylist(@RequestBody @Valid NewPlaylistDto dto) {
-		if(playlistService.isTitleValid(dto)) {
-			PlaylistDto newPlaylist = playlistService.createNewPlaylist(dto);
-			if(dto.getUserId()==null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-						new ErrorDto(403, "Please insert a valid userId."));
-				}
-			if(newPlaylist != null) {
-				log.info("New playlist successfuly created.");
-				return ResponseEntity.status(HttpStatus.CREATED).body(newPlaylist);
-			}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ErrorDto(404, "User id " + dto.getUserId() + " not found."));
-		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-				new ErrorDto(403, "This title is already being used in another Playlist."));
+		PlaylistDto newPlaylist = playlistService.createNewPlaylist(dto);
+		log.info("New playlist successfuly created.");
+		return ResponseEntity.status(HttpStatus.CREATED).body(newPlaylist);
 	}
+	
 //	@GetMapping(path="/user/{id}")
 //	//comentar sobre query parameter
 //	public ResponseEntity<Page<?>> listAllPlaylistsByUserId(
@@ -65,79 +58,47 @@ public class PlaylistController {
 //		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
 //				new ErrorDto(404, "User Id " + id + " not found."));
 //	}
-	@GetMapping(path="/user/{id}")
-	//comentar sobre query parameter
-	public ResponseEntity<?> listAllPlaylistsByUserId(@PathVariable Long id) {
-		if (!(playlistService.getUserPlaylists(id)==null)) {
-			List<PlaylistDto> playlists = playlistService.getUserPlaylists(id);
-			return ResponseEntity.status(HttpStatus.OK).body(playlists);
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User Id " + id + " not found."));
+	
+	@GetMapping
+	public ResponseEntity<?> listAllPlaylistsByUserId(@PathParam(value = "user") Long user) {
+		List<PlaylistDto> playlists = playlistService.getUserPlaylists(user);
+		return ResponseEntity.status(HttpStatus.OK).body(playlists);
 	}
+	
 	@PutMapping(path="/{id}")
 	@Transactional
-	public ResponseEntity<?> updatePlaylist(@PathVariable Long id,
-			@RequestBody @Valid NewPlaylistDto dto) {
-		if(dto.getUserId()!=null) {
-			PlaylistDto updatedPlaylist = playlistService.update(id, dto);
-			if(updatedPlaylist != null) {
-				return ResponseEntity.status(HttpStatus.OK).body(updatedPlaylist);
-			}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ErrorDto(404, "Playlist Id " + id + " not found."));	
-		}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Invalid User Id."));	
-		}
+	public ResponseEntity<?> updatePlaylist(@PathVariable Long id, @RequestBody @Valid NewPlaylistDto dto) {
+		PlaylistDto updatedPlaylist = playlistService.update(id, dto);
+		return ResponseEntity.status(HttpStatus.OK).body(updatedPlaylist);
+	}
+	
 	@DeleteMapping(path="/{id}")
 	@CacheEvict(value="listPlaylistTracksById", allEntries = true)
 	public ResponseEntity<?> deletePlaylist(@PathVariable Long id) {
-		Long deletedPlaylistId = playlistService.deletePlaylist(id);
-		if (!(deletedPlaylistId==null)) {
-			log.info("Playlist successfuly deleted.");
-			return ResponseEntity.status(HttpStatus.OK).body(
-					"Playlist " + id + " deleted.");
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Playlist " + id + " not found."));
-	}	
+		playlistService.deletePlaylist(id);
+		log.info("Playlist successfuly deleted.");
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+	}
+	
 	@PostMapping(path="/{id}/tracks")
 	@Transactional
 	@CacheEvict(value="listPlaylistTracksById", allEntries = true)
 	public ResponseEntity<?> postTrack(@PathVariable Long id, @RequestBody TrackDto dto) {
-		Playlist playlist = playlistService.getPlaylist(id);
-		if (playlist==null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ErrorDto(404, "Playlist " + id + " not found."));
-		}
+		playlistService.getPlaylist(id);
 		TrackExtendedDto track = playlistService.addTrackToPlaylist(id, dto);
-		if (track!=null) {
-			return ResponseEntity.status(HttpStatus.OK).body(track);
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(
-				400, "Track " + dto.getId() + " not found or already added to playlist " + id + "."));
+		return ResponseEntity.status(HttpStatus.OK).body(track);
 	}
+	
 	@GetMapping(path="/{id}/tracks")
 	@Cacheable(value="listPlaylistTracksById")
 	public ResponseEntity<?> listPlaylistTracksById(@PathVariable Long id) {
-		if (playlistService.getPlaylistTracks(id)!=null){
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(playlistService.getPlaylistTracks(id));
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "Playlist " + id + " not found."));
+		return ResponseEntity.status(HttpStatus.OK).body(playlistService.getPlaylistTracks(id));
 	}
+	
 	@DeleteMapping(path="/{id}/tracks/{trackId}")
 	@CacheEvict(value="listPlaylistTracksById", allEntries = true)
 	public ResponseEntity<?> deleteTracks(@PathVariable Long id, @PathVariable String trackId){
-		if (playlistService.deleteTracksFromPlaylist(id, trackId)!=null){
-			playlistService.deleteTracksFromPlaylist(id, trackId);
-			return ResponseEntity.status(HttpStatus.OK).body(
-					"Track "+trackId+" deleted from playlist "+id+".");
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(new ErrorDto(
-						404, "Playlist "+id+" or track "+trackId+" not found."));
+		playlistService.deleteTracksFromPlaylist(id, trackId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 }

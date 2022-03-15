@@ -12,11 +12,16 @@ import org.springframework.stereotype.Service;
 
 import br.inatel.mymusicapi.dto.NewUserDto;
 import br.inatel.mymusicapi.dto.UserDto;
+import br.inatel.mymusicapi.exception.InvalidEmailException;
+import br.inatel.mymusicapi.exception.InvalidPasswordException;
+import br.inatel.mymusicapi.exception.InvalidUserNameException;
+import br.inatel.mymusicapi.exception.UserNotFoundException;
 import br.inatel.mymusicapi.model.Playlist;
 import br.inatel.mymusicapi.model.User;
 import br.inatel.mymusicapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,16 +29,33 @@ public class UserService {
 	
 	@Autowired
 	private final UserRepository repository;
-
+	
+	public boolean validateNewUser (NewUserDto dto) {
+		if (!isNameValid(dto.getName())) {
+			throw new InvalidUserNameException(dto.getName());
+		}
+		if (!isEmailValid(dto)) {
+			throw new InvalidEmailException(dto.getEmail());
+		}
+		if (!isPasswordValid(dto)) {
+			throw new InvalidPasswordException(dto.getPassword());
+		}
+		return true;
+	}
+	
+	public boolean isNameValid(String name) {
+		if (name.length()>=15) {
+		return false;
+		}
+		return true;
+	}
+	
 	public UserDto createNewUser(NewUserDto dto) {
-		if(isEmailValid(dto)) {
 			User user = new User(dto);
 			user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 			User newUser = repository.save(user);
 			log.info("New user added to database repository.");
 			return new UserDto(newUser);
-		}
-		return null;
 	}
 	
 	public boolean isEmailValid(NewUserDto dto) {
@@ -59,7 +81,7 @@ public class UserService {
 	}
 	
 	public boolean isPasswordValid(NewUserDto dto) {
-		if (dto.getPassword().toString().length()==8) {
+		if (dto.getPassword().toString().length()>=8) {
 			log.info("Validating password.");
 			return true;
 		}
@@ -73,7 +95,7 @@ public class UserService {
 			log.info("User deleted from database repository.");
 			return user.get().getId();
 		}
-		return null;
+		throw new UserNotFoundException(id);
 	}
 
 	public UserDto getUser(Long id) {
@@ -81,9 +103,9 @@ public class UserService {
 		log.info("Searching for user in repository...");
 		if (user.isPresent()) {
 			return new UserDto(user.get());
+		} else {
+			throw new UserNotFoundException(id);
 		}
-//		throw new RuntimeException(); // tratar exception
-		return null; // trocar por exception tratada
 	}
 
 	public List<Playlist> getUserPlaylists (Long id) {

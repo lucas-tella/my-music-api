@@ -1,5 +1,6 @@
 package br.inatel.mymusicapi.dto;
 import lombok.Data;
+
 @Data
 public class TrackExtendedDto {
 	private String id;

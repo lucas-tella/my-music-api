@@ -13,52 +13,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.inatel.mymusicapi.dto.ErrorDto;
 import br.inatel.mymusicapi.dto.NewUserDto;
 import br.inatel.mymusicapi.dto.UserDto;
 import br.inatel.mymusicapi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RestController
 @RequestMapping (value = "/users")
 public class UserController {
+	
 	@Autowired 
 	private UserService userService;
+	
 	@PostMapping
 	public ResponseEntity<?> postUser(@RequestBody @Valid NewUserDto dto) {
-		if(dto.getName().length()>15) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new ErrorDto(400, "The user name must have under 15 characters."));
-		}
-		if (userService.isEmailValid(dto)) {
-			if(userService.isPasswordValid(dto)) {
-				UserDto newUser = userService.createNewUser(dto);
-				log.info("New user successfuly created.");
-				return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-			}
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-					new ErrorDto(403, "The password must have 8 characters."));
-		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-				new ErrorDto(403, "Invalid email."));
+			userService.validateNewUser(dto);
+			UserDto newUser = userService.createNewUser(dto);
+			log.info("New user successfuly created.");
+			return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
 	}
+	
 	@GetMapping(path="/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Long id) {
 		UserDto dto = userService.getUser(id);
-		if (!(dto == null)) {
-			return ResponseEntity.status(HttpStatus.OK).body(dto);
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User Id '" + id + "' not found."));
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
+	
 	@DeleteMapping(path="/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		Long deletedUserId = userService.deleteUser(id);
-		if (!(deletedUserId==null)) {
-			log.info("User successfuly deleted.");
-			return ResponseEntity.status(HttpStatus.OK).body("User " + id + " deleted.");
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ErrorDto(404, "User " + id + " not found."));
+		userService.deleteUser(id);
+		log.info("User successfuly deleted.");
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 }

@@ -17,14 +17,17 @@ import br.inatel.mymusicapi.dto.LoginDto;
 import br.inatel.mymusicapi.dto.TokenDto;
 import br.inatel.mymusicapi.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RestController
 @RequestMapping("/login")
 public class AuthenticationController {
+	
 	@Autowired
 	AuthenticationManager authenticationManager;
 	@Autowired
 	TokenService tokenService;
+	
 	@PostMapping
 	public ResponseEntity<TokenDto> authentication(@RequestBody @Valid LoginDto dto){
 		UsernamePasswordAuthenticationToken loginData = dto.convert();

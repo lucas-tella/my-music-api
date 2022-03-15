@@ -3,7 +3,7 @@ Feature: Registering a new User and new Playlist and then Deleting it
 Background: 
 		* url baseUrl
 		* def random = function(){return java.lang.System.currentTimeMillis()}
-		* def userEmail = 'qa.playlist.delete'+random()+'@test.com'
+		* def userEmail = 'qa.playlist.delete' + random() + '@test.com'
 		* def playlistTitle = 'title'+random()
 
 Scenario: Should register a new user and a new playlist, then delete it
@@ -37,8 +37,7 @@ Scenario: Should register a new user and a new playlist, then delete it
     Given path 'playlists/'+playlist.id
 		And header Authorization = 'Bearer ' + token
 		When method DELETE
-		Then status 200
-    And match response contains 'Playlist '+playlist.id+' deleted.'
+		Then status 204
  
  Scenario: Should not delete a new playlist if not authenticated
     Given path 'users'
@@ -94,7 +93,7 @@ Scenario: Should display error message if playlist id is invalid
     * def playlist = response
     
     * def random = random()
-    * def expectedErrorMessage = 'Playlist '+random()+' not found.'
+    * def expectedErrorMessage = 'Playlist '+ random +' not found.'
     
     Given path 'playlists/'+random
 		And header Authorization = 'Bearer ' + token

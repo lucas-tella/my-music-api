@@ -44,16 +44,12 @@ Scenario: Should register a new user, a new playlist, add a track to it and then
     Then status 200
     And match response contains{'id':'#(playlist.id)','title':'#(playlistTitle)','description':'#notnull','userId':'#(user.id)','tracks':'#notnull'}
     
-    * def expectedMessage = 'Track '+trackId+' deleted from playlist '+playlist.id+'.'
-    
     Given path 'playlists/'+playlist.id+'/tracks/'+trackId
     And header Authorization = 'Bearer '+token
 		When method DELETE
-		Then status 200
-		And match response contains '#(expectedMessage)'
+		Then status 204
 		    
 Scenario: Should not delete track without authentication
-    
     Given path 'users'
     And request {"name": 'Lucas', "email": '#(userEmail)', "password": '12345678'}
     When method POST

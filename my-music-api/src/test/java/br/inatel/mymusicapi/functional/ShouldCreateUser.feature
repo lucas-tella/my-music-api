@@ -26,21 +26,16 @@ Scenario: Should register a new user and check if we can find it
     Then status 200
     And match response contains {"id": '#notnull', "name": 'Lucas', "email": '#(userEmail)'}
     
-    
 Scenario: Should not register a new user with invalid email
     Given path 'users'
     And request {"name": 'Lucas', "email": 'qatest.br', "password": '12345678'}
     When method POST
     Then status 400
 
-Scenario: Should not register a new user without eigth-characters-password
+Scenario: Should not register a new user with less-than-eigth-characters-password
     Given path 'users'
     And request {"name": 'Lucas', "email": '#(userEmail)', "password": '1234567'}
     When method POST
     Then status 400
+    And match response contains {"status":400,"message":"Password must have at least 8 characters."}
     
-    Given path 'users'
-    And request {"name": 'Lucas', "email": '#(userEmail)', "password": '123456789'}
-    When method POST
-    Then status 403
-    And match response contains{'status':403,'message':'The password must have 8 characters.'}

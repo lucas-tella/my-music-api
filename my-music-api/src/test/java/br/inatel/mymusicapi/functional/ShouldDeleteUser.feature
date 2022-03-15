@@ -23,8 +23,7 @@ Scenario: Should delete existing user if authenticated
 		Given path 'users/'+user.id
 		And header Authorization = 'Bearer ' + token
 		When method DELETE
-		Then status 200
-		And match response contains 'User '+user.id+' deleted.'
+		Then status 204
 		
 Scenario: Should not delete existing user if not authenticated
 		Given path 'users'

@@ -15,13 +15,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 import br.inatel.mymusicapi.dto.TrackExtendedDto;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+
 @Slf4j
 @Component
 public class ExternalApiAdapter {
+	
     @Value("${deezer.api.url}")
     private String url;
     @Value("${deezer.api.key}")
     private String key;
+    
     public TrackExtendedDto getTrackById(String id) {
     	WebClient webClient = buildWebClient();
         Mono<TrackExtendedDto> trackMono = webClient.get()
@@ -33,6 +36,7 @@ public class ExternalApiAdapter {
         log.info("Track data retrieved from external api.");
         return trackMono.block();
     }
+    
     @SuppressWarnings("unchecked")
     private Mono<Exception> throwException(ClientResponse response){
     	log.info("External api error.");
@@ -40,7 +44,9 @@ public class ExternalApiAdapter {
         String errorMessage = (String) responseBody.get("An error has occurred while trying to reach external API.");
         return Mono.error(new Exception(errorMessage));
     }
-    private WebClient buildWebClient(){
+    
+    public WebClient buildWebClient(){ 
+    	//it was a private method. double-check it.
         return WebClient.builder()
                 .baseUrl(url)
                 .defaultHeader(ACCEPT, APPLICATION_JSON_VALUE)

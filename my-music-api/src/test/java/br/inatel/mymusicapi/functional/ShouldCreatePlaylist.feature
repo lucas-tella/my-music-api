@@ -92,12 +92,14 @@ Scenario: Should not register a new playlist with invalid title
     Then status 201
     * def newPlaylist = response
     
+    * def expectedErrorMessage = "Title '" + newPlaylist.title + "' is already in use."
+    
     Given path 'playlists'
     And request {'title':'#(newPlaylist.title)','description':'my first playlist','userId':'#(user.id)'}
     And header Authorization = 'Bearer ' + token
     When method POST
-    Then status 403
-    And match response contains{'status':403,'message':'This title is already being used in another Playlist.'}
+    Then status 400
+    And match response contains{'status':400,'message':'#(expectedErrorMessage)'}
     
 Scenario: Should not register a new playlist with invalid user id
     Given path 'users'
@@ -120,7 +122,7 @@ Scenario: Should not register a new playlist with invalid user id
     Then status 200
     
     * def invalidId = random()
-    * def expectedErrorMessage = 'User id '+invalidId+' not found.'
+    * def expectedErrorMessage = 'User '+invalidId+' not found.'
     
     Given path 'playlists'
 		And header Authorization = 'Bearer ' + token
